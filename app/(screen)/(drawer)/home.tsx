@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { router } from "expo-router";
 
 export default function Home() {
   const screenHeight = Dimensions.get("window").height;
@@ -112,24 +114,29 @@ export default function Home() {
             ].map((item, index) => (
               <Pressable
                 key={index}
+                onPress={()=>router.push('listUserModal' as any)}
                 style={{
                   alignItems: "center",
                   width: "22%",
                 }}
               >
-                <View
-                  style={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: 25,
-                    backgroundColor: "#f5f5f5",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 8,
-                  }}
-                >
-                  <Feather name={item.icon as any} size={24} color="#2563eb" />
-                </View>
+                  <View
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 25,
+                      backgroundColor: "#f5f5f5",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Feather
+                      name={item.icon as any}
+                      size={24}
+                      color="#2563eb"
+                    />
+                  </View>
                 <Text style={{ color: "#666" }}>{item.label}</Text>
               </Pressable>
             ))}
@@ -207,7 +214,10 @@ export default function Home() {
                 }}
               >
                 {item.amount > 0 ? "+" : ""}
-                {item.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                {item.amount.toLocaleString("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                })}
               </Text>
             </Pressable>
           ))}

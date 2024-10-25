@@ -1,46 +1,25 @@
 import api from "@/api/api";
-import { Link, router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import UserCard from "@/components/Card";
+import { router,useRouter, useSegments  } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
 
-const UserCard = ({ user }: { user: User }) => {
-  if (!user) return null;
-  const openModal = () => {
-    router.push({
-      pathname: '/modal',
-      params: { 
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        avatar: user.avatar
-      }
-    });
-  };
-  return (
-    <TouchableOpacity onPress={openModal}>
-      <View style={styles.card}>
-        <Image source={{ uri: user.avatar }} style={styles.avatar} />
-        <View style={styles.userInfo}>
-          <Text
-            style={styles.name}
-          >{`${user.first_name} ${user.last_name}`}</Text>
-          <Text style={styles.email}>{user.email}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+export type User = {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  avatar: string;
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     padding: 20,
@@ -100,26 +79,35 @@ const styles = StyleSheet.create({
   },
 });
 
-interface User {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  avatar: string;
-}
-
-export default function App() {
+export default function ListUser() {
   const [listUser, setListUser] = useState<User[]>([]);
-  
-  async function fetchUsers(page: number = 1) {
+  const [page, setPage] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const fetchUsers = async (page: number = 1) => {
     try {
       const response = await api.get(`users?page=${page}`);
       setListUser(response.data.data);
     } catch (error) {
       console.error("Failed to fetch users:", error);
     }
-  }
-  const [searchTerm, setSearchTerm] = useState("");
+  };
+  const routers = useSegments();
+
+  console.log(routers)
+  useEffect(() => {
+    fetchUsers(page);
+  }, [page]);
+
+  const handleNextPage = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage((prevPage) => prevPage - 1);
+    }
+  };
+
   const filterUser = listUser.filter(
     (user) =>
       `${user.first_name} ${user.last_name}`
@@ -127,51 +115,26 @@ export default function App() {
         .includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#f0f0f0",
-        justifyContent: "flex-start",
-      }}
-    >
-      {/* <Link href="/modal" >Test modal</Link> */}
-      <View>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Cari Nama"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
-      </View>
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 5,
-        }}
-      >
-        <TouchableOpacity
-          style={styles.navigationButton}
-          // onPress={handleNextPage}
-          // disabled={loading}
-        >
+    <View style={{ flex: 1, backgroundColor: "#f0f0f0", justifyContent: "flex-start" }}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Cari Nama"
+        value={searchTerm}
+        onChangeText={setSearchTerm}
+      />
+      
+      <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 5 }}>
+        <TouchableOpacity style={styles.navigationButton} onPress={handlePreviousPage} disabled={page === 1}>
           <Text style={styles.navigationText}>Sebelumnya</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navigationButton}
-          // onPress={handleNextPage}
-          // disabled={loading}
-        >
+        
+        <TouchableOpacity style={styles.navigationButton} onPress={handleNextPage}>
           <Text style={styles.navigationText}>Selanjutnya</Text>
         </TouchableOpacity>
       </View>
+
       <FlatList
         data={filterUser}
         keyExtractor={(item) => item.id.toString()}

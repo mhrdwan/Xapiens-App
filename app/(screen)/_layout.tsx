@@ -57,6 +57,20 @@ export default function RootLayoutScreen() {
             ),
           }}
         />
+      <Stack.Screen
+          name="listUserModal"  
+          options={{
+            presentation: 'modal',  
+            headerShown: true,
+            headerStyle: { backgroundColor: colorScheme === "dark"? "#f7f7fb" : "#212121" },
+            headerTitle: "",
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Text style={{ fontSize: 15 }}>Close</Text>
+              </TouchableOpacity>
+            ),
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
