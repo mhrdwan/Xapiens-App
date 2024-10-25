@@ -88,7 +88,7 @@ export default function ListUser() {
       const response = await api.get(`users?page=${page}`);
       setListUser(response.data.data);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      console.error(error);
     }
   };
   const routers = useSegments();

@@ -173,6 +173,7 @@ const loginPage = () => {
             </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
+        <Text style={{display:'flex' ,  textAlign:'center'}}>Powered By Ridwan</Text>
       </SafeAreaView>
     </LinearGradient>
   );
